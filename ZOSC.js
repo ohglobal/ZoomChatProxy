@@ -53,6 +53,9 @@ module.exports = class ZoomOSC extends EventEmitter{
             case "user/chat":
             this.emit("chat",msg)
             break;
+            case "user/askedQuestion":
+            this.emit("question",msg)
+            break;
         }
         
       });

@@ -24,16 +24,16 @@ function start(){
   }
    
     if(Config.HttpPort == null){
-     Config = {"HttpPort":"8080","ZoomPort":"8081","H2RAdress":" http://127.0.0.1:4001/data/BBNHJ360SU/"}; 
+     Config = {"HttpPort":"8080","ZoomIP":"127.0.0.1","ZoomPort":"8081","H2RAdress":" http://127.0.0.1:4001/data/BBNHJ360SU/"}; 
      saveConfig(); 
     }
     server.listen(Config.HttpPort)
     //start the ZoomOSC connection
     console.log("Starting ZoomOSC connection",)
-    zoscCon = new Zosc("192.168.178.110",9090,1234);
+    zoscCon = new Zosc(Config.ZoomIP,Config.ZoomPort,1234);
     zoscCon.on("newUser",(user)=>{
       user.on("chat",(msg)=>{
-        console.log("new chat message",msg,user)
+        console.log("new chat message",msg,user.userName)
         MSGS.push({"chatmessage":msg,"username":user.userName});
         if(Config.H2RAdress != ""){
           axios.post(Config.H2RAdress,{"messages": [{ "id": uid(5),

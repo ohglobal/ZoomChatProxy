@@ -17,9 +17,9 @@
   },
   "homepage": "https://github.com/ohglobal/ZoomChatProxy#readme",
   "dependencies": {
+    "@bytehive/zoomoscjs": "^0.0.3",
     "axios": "^0.24.0",
     "express": "^4.17.1",
-    "node-osc": "^6.1.7",
-    "socket.io": "^4.2.0"
+    "uid": "^2.0.1"
   }
 }

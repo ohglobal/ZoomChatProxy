@@ -1,14 +1,12 @@
-const ZOSC = require("./ZOSC")
 const express = require('express')
+//import Bytehive/ZoomOSCJS
+const {Zosc} = require('@bytehive/zoomoscjs');
 const app = express();
 const http = require('http');
 const server = http.createServer(app);
-const { Server } = require("socket.io");
-const { setupMaster } = require("cluster");
-const io = new Server(server);
 const axios = require('axios');
 const fs = require('fs');
-
+const { uid } = require('uid');
 //creation of a new ZoomOSC conection
 var zoscCon = null;
 //Global Variable to store the chat messages in
@@ -26,35 +24,39 @@ function start(){
   }
    
     if(Config.HttpPort == null){
-     Config = {"HttpPort":"8080","ZoomPort":"8081","H2RAdress":"http://localhost:4001/api/ABCD/"}; 
+     Config = {"HttpPort":"8080","ZoomPort":"8081","H2RAdress":" http://127.0.0.1:4001/data/BBNHJ360SU/"}; 
      saveConfig(); 
     }
     server.listen(Config.HttpPort)
-    zoscCon = new ZOSC(Config.ZoomPort);
-    //Setup of the ZOSC Connection
-    //Store Chat messages
-    zoscCon.on("chat",(msg)=>{
-      MSGS.push({"user":msg[2],"content":msg[5]})
-      console.log(MSGS)
-      axios.post(Config.H2RAdress+"updateVariableList/1/addRow",{row: [ {value: msg[2]},{value: msg[5]},{value: "ZoomChat"}]}).then((res)=>{
-        console.log(res)
-      })
+    //start the ZoomOSC connection
+    console.log("Starting ZoomOSC connection",)
+    zoscCon = new Zosc("192.168.178.110",9090,1234);
+    zoscCon.on("newUser",(user)=>{
+      user.on("chat",(msg)=>{
+        console.log("new chat message",msg,user)
+        MSGS.push({"chatmessage":msg,"username":user.userName});
+        if(Config.H2RAdress != ""){
+          axios.post(Config.H2RAdress,{"messages": [{ "id": uid(5),
+                    "snippet": {
+                        "displayMessage": msg
+                    },
+                    "authorDetails": {
+                        "displayName": user.userName,
+                        "profileImageUrl": ""
+                    },
+                },
+            ]
+        })
+        }
+      })  
+    
+    user.on("question",(question)=>{
+      console.log("new question",question)
+      Questions.push({"question":question,"username":user.userName});
     })
-    //Store Question
-    zoscCon.on("question",(msg)=>{
-    Questions.push({"user":msg[2],"content":msg[5],"status":"ready"})
-    console.log("qs",MSGS)
-    io.emit("updateOuestions",Questions);
-    axios.post(Config.H2RAdress+"updateVariableList/1/addRow",{row: [ {value: msg[2]},{value: msg[5]},{value: "ZoomQuestion"}]}).then((res)=>{
-      console.log(res)
-    })
-    })
-    //Store Active Speaker
-    zoscCon.on("activeSpeaker",(msg)=>{
-    console.log("as is",msg[2])
-    AS = msg[2];
-    })
-}
+  })
+  }
+
 function saveConfig(){
     fs.writeFileSync('settings.json', JSON.stringify(Config));
     
@@ -63,15 +65,10 @@ function saveConfig(){
 app.get('/chat', function (req, res) {
     res.json(MSGS)
   })
-  app.get('/questions', function (req, res) {
-    res.json(Questions.filter((question)=>{return question.status =="selected"}))
-    console.log(Questions.filter((question)=>{return question.status =="selected"}));
-  })
   app.get('/allquestions', function (req, res) {
     res.json(Questions)
   })
   app.get('/as', function (req, res) {
     res.send(AS)
   })
-
 start()

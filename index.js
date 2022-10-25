@@ -53,6 +53,19 @@ function start(){
     user.on("question",(question)=>{
       console.log("new question",question)
       Questions.push({"question":question,"username":user.userName});
+      if(Config.H2RAdress != ""){
+        axios.post(Config.H2RAdress,{"messages": [{ "id": uid(5),
+                  "snippet": {
+                      "displayMessage": question
+                  },
+                  "authorDetails": {
+                      "displayName": user.userName,
+                      "profileImageUrl": ""
+                  },
+              },
+          ]
+      })
+      }
     })
   })
   }

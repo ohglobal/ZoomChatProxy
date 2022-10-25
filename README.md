@@ -9,7 +9,8 @@ Brings Zoom Chat and Zoom Questions over to H2R Graphics or Vmix
 4. run `npm install`
 5. run `node index.js`
 
-## Configs 
+## Settings 
+to configure this app you need to edit the `settings.json` file placed in the same folder as the `index.js`.file.
 ### HttpPort:
 defaults to 8080
 used to set the Port used on the Webserver for integration into VMIX 
@@ -17,10 +18,14 @@ used to set the Port used on the Webserver for integration into VMIX
 ### ZoomPort:
 defaults to 8081
 used to set the Port used of where ZoomOSC sends it's OSC to
-
+### ZoomIP:
+defaults to 127.0.0.1 
+used to set the IP of where ZoomOSC lives on
 ### H2RAdress :
-defaults to http://localhost:4001/api/ABCD/"
-used to set the API address of H2R Graphics used for sending Chat and Questions into H2R Graphics List 
+used to set the HTTPlistsner Adress of H2R Graphics, first create a Http listner Data source first in H2R Graphics and then copy the Adress from the Data source into this field.
+## ZoomOSC Settings
+TransmissonPort should be set to 1234
+
 
 ## Todos 
 - [x] Inital Version
@@ -35,3 +40,5 @@ used to set the API address of H2R Graphics used for sending Chat and Questions 
 [H2R Graphics](https://h2r.graphics)
 
 [Vmix](https://www.vmix.com)
+
+[Zoomoscjs](https://www.npmjs.com/package/@bytehive/zoomoscjs)

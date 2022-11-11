@@ -49,7 +49,9 @@ function start(){
         })
         }
       })  
-    
+    user.on("activeSpeaker",()=>{
+      AS = user.userName;
+    });
     user.on("question",(question)=>{
       console.log("new question",question)
       Questions.push({"question":question,"username":user.userName});
